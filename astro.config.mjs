@@ -1,15 +1,19 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
-import cloudflare from '@astrojs/cloudflare';
 import sitemap from '@astrojs/sitemap';
 import keystatic from '@keystatic/astro';
+import cloudflare from '@astrojs/cloudflare';
+
+// CF_PAGES=1 is injected automatically by Cloudflare Pages CI
+const isCloudflarePages = !!process.env.CF_PAGES;
 
 export default defineConfig({
   site: 'https://omrminiatures.eu',
-  adapter: cloudflare(),
+  output: isCloudflarePages ? 'static' : 'server',
+  adapter: isCloudflarePages ? undefined : cloudflare(),
   integrations: [
     sitemap(),
-    keystatic(),
+    ...(!isCloudflarePages ? [keystatic()] : []),
   ],
   i18n: {
     defaultLocale: 'en',
