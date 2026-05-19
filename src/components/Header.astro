@@ -1,0 +1,43 @@
+---
+import type { Locale } from '../i18n';
+import { t, localePath, LOCALE_LABELS } from '../i18n';
+
+export interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const tr = t(locale);
+const lp = (path: string) => localePath(locale, path);
+const otherLocales = (['en', 'es', 'it'] as Locale[]).filter(l => l !== locale);
+---
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={lp('/')} class="logo">
+      <span>O.M.R</span> Miniatures
+      <small>The Belle Époque Art Project</small>
+    </a>
+
+    <nav class="nav-links">
+      <a href={lp('/')}>{tr.nav.home}</a>
+      <a href={lp('/catalog/')}>{tr.nav.catalog}</a>
+      <a href={lp('/about/')}>{tr.nav.about}</a>
+      <a href={lp('/contact/')}>{tr.nav.contact}</a>
+    </nav>
+
+    <div class="nav-right">
+      <div class="lang-switcher">
+        <a href={lp('/')} class="active">{LOCALE_LABELS[locale]}</a>
+        {otherLocales.map(l => (
+          <a href={localePath(l, Astro.url.pathname.replace(`/${locale}`, '') || '/')}>{LOCALE_LABELS[l]}</a>
+        ))}
+      </div>
+      <a href={lp('/wishlist/')} class="wishlist-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        <span class="wishlist-count"></span>
+      </a>
+      <button class="burger" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>

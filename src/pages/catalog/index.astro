@@ -1,0 +1,186 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { t, localePath, COLLECTION_LABELS, COUNTRY_LABELS } from '../../i18n';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../../keystatic.config';
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const figurines = await reader.collections.figurines.all();
+const sorted = [...figurines].sort((a, b) => a.entry.nameEn.localeCompare(b.entry.nameEn));
+---
+<Layout
+  title="Catalog — O.M.R Miniatures"
+  description="Browse the full catalog of handcrafted tin miniatures. Filter by collection or historical country."
+  locale={locale}
+  canonical="https://omrminiatures.eu/catalog/"
+>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="section-label">{tr.catalog.title}</span>
+    <h1>The <em>Collection</em></h1>
+    <p>{figurines.length} unique handcrafted pieces</p>
+  </div>
+</div>
+
+<section class="section" style="padding-top: 48px;">
+  <div class="container">
+    <!-- Filters (client-side) -->
+    <div class="catalog-filters" id="filters">
+      <span class="filter-label">{tr.catalog.filter_collection}:</span>
+      <button class="filter-chip active" data-filter="collection" data-value="">{tr.catalog.filter_all}</button>
+      {Object.entries(COLLECTION_LABELS).map(([slug, label]) => (
+        <button class="filter-chip" data-filter="collection" data-value={slug}>{label}</button>
+      ))}
+      <div class="filter-sep"></div>
+      <span class="filter-label">{tr.catalog.filter_country}:</span>
+      <button class="filter-chip active" data-filter="country" data-value="">{tr.catalog.filter_all}</button>
+      {Object.entries(COUNTRY_LABELS).map(([slug, label]) => (
+        <button class="filter-chip" data-filter="country" data-value={slug}>{label}</button>
+      ))}
+    </div>
+
+    <!-- Grid -->
+    <div class="figurine-grid" id="fig-grid">
+      {sorted.map(fig => (
+        <div
+          class="fig-card"
+          data-collection={fig.entry.collection}
+          data-countries={fig.entry.countries?.join(',')}
+          data-slug={fig.slug}
+        >
+          <a href={lp(`/figurine/${fig.slug}/`)} class="fig-card-img">
+            {fig.entry.images?.[0]
+              ? <img src={fig.entry.images[0] as string} alt={fig.entry.nameEn} loading="lazy" />
+              : <div style="width:100%;height:100%;background:var(--bg-3);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2.5rem;">✠</div>
+            }
+          </a>
+          <div class="fig-card-body">
+            <div class="fig-card-tags">
+              <span class="fig-tag">{COLLECTION_LABELS[fig.entry.collection]}</span>
+              {fig.entry.countries?.slice(0,1).map(c => (
+                <span class="fig-tag">{COUNTRY_LABELS[c]}</span>
+              ))}
+            </div>
+            <div class="fig-card-name">{fig.entry.nameEn}</div>
+            <div class="fig-card-actions">
+              <button
+                class="btn-wishlist"
+                data-slug={fig.slug}
+                data-name={fig.entry.nameEn}
+                data-img={fig.entry.images?.[0] ?? ''}
+                data-collection={fig.entry.collection}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                </svg>
+                <span class="wl-label">{tr.catalog.add_wishlist}</span>
+              </button>
+              <a href={lp(`/figurine/${fig.slug}/`)} class="btn btn-ghost" style="padding:6px 12px;font-size:0.65rem;">View</a>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div id="no-results" style="display:none; text-align:center; padding:64px 0; color:var(--mid);">
+      {tr.catalog.no_results}
+    </div>
+  </div>
+</section>
+</Layout>
+
+<script>
+// ── Wishlist helpers ──
+function getWishlist(): string[] {
+  try { return JSON.parse(localStorage.getItem('omr_wishlist') || '[]'); } catch { return []; }
+}
+function saveWishlist(wl: string[]) {
+  localStorage.setItem('omr_wishlist', JSON.stringify(wl));
+  window.dispatchEvent(new CustomEvent('wishlist-updated'));
+}
+
+function syncWishlistButtons() {
+  const wl = getWishlist();
+  document.querySelectorAll<HTMLButtonElement>('.btn-wishlist').forEach(btn => {
+    const slug = btn.dataset.slug!;
+    const inList = wl.includes(slug);
+    btn.classList.toggle('added', inList);
+    const label = btn.querySelector<HTMLElement>('.wl-label');
+    if (label) label.textContent = inList ? btn.dataset.added ?? 'Added' : btn.dataset.add ?? 'Add to Wishlist';
+  });
+}
+
+document.querySelectorAll<HTMLButtonElement>('.btn-wishlist').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const slug = btn.dataset.slug!;
+    const wl = getWishlist();
+    const idx = wl.indexOf(slug);
+    if (idx === -1) {
+      wl.push(slug);
+      // Store metadata for wishlist page
+      const meta = JSON.parse(localStorage.getItem('omr_wishlist_meta') || '{}');
+      meta[slug] = { name: btn.dataset.name, img: btn.dataset.img, collection: btn.dataset.collection };
+      localStorage.setItem('omr_wishlist_meta', JSON.stringify(meta));
+    } else {
+      wl.splice(idx, 1);
+    }
+    saveWishlist(wl);
+    syncWishlistButtons();
+  });
+});
+
+syncWishlistButtons();
+window.addEventListener('wishlist-updated', syncWishlistButtons);
+
+// ── Filters ──
+let activeCollection = '';
+let activeCountry = '';
+
+function applyFilters() {
+  const cards = document.querySelectorAll<HTMLElement>('#fig-grid .fig-card');
+  let visible = 0;
+  cards.forEach(card => {
+    const col = card.dataset.collection ?? '';
+    const countries = (card.dataset.countries ?? '').split(',');
+    const colMatch = !activeCollection || col === activeCollection;
+    const cntMatch = !activeCountry || countries.includes(activeCountry);
+    const show = colMatch && cntMatch;
+    card.style.display = show ? '' : 'none';
+    if (show) visible++;
+  });
+  const noResults = document.getElementById('no-results');
+  if (noResults) noResults.style.display = visible === 0 ? '' : 'none';
+}
+
+document.querySelectorAll<HTMLButtonElement>('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const filter = chip.dataset.filter!;
+    const value = chip.dataset.value!;
+    // Update active state within this filter group
+    document.querySelectorAll<HTMLButtonElement>(`.filter-chip[data-filter="${filter}"]`)
+      .forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    if (filter === 'collection') activeCollection = value;
+    if (filter === 'country') activeCountry = value;
+    applyFilters();
+  });
+});
+
+// Apply filter from URL query params
+const params = new URLSearchParams(window.location.search);
+const qCollection = params.get('collection');
+const qCountry = params.get('country');
+if (qCollection) {
+  const chip = document.querySelector<HTMLButtonElement>(`.filter-chip[data-filter="collection"][data-value="${qCollection}"]`);
+  chip?.click();
+}
+if (qCountry) {
+  const chip = document.querySelector<HTMLButtonElement>(`.filter-chip[data-filter="country"][data-value="${qCountry}"]`);
+  chip?.click();
+}
+</script>

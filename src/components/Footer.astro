@@ -1,0 +1,44 @@
+---
+import type { Locale } from '../i18n';
+import { t, localePath } from '../i18n';
+
+export interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const tr = t(locale);
+const lp = (path: string) => localePath(locale, path);
+---
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <a href={lp('/')} class="logo">
+          <span>O.M.R</span> Miniatures
+          <small>The Belle Époque Art Project</small>
+        </a>
+        <p class="footer-tagline">{tr.footer.tagline}</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href={lp('/')}>{tr.nav.home}</a></li>
+          <li><a href={lp('/catalog/')}>{tr.nav.catalog}</a></li>
+          <li><a href={lp('/about/')}>{tr.nav.about}</a></li>
+          <li><a href={lp('/contact/')}>{tr.nav.contact}</a></li>
+          <li><a href={lp('/wishlist/')}>{tr.nav.wishlist}</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>{tr.contact.follow}</h4>
+        <ul>
+          <li><a href="https://instagram.com/omrminiatures" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="https://facebook.com/druzhinin.k" target="_blank" rel="noopener">Facebook</a></li>
+          <li><a href="mailto:omrminiatures@gmail.com">omrminiatures@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>{tr.footer.rights}</span>
+      <a href={lp('/privacy/')}>{tr.footer.privacy}</a>
+    </div>
+  </div>
+</footer>

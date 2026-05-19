@@ -1,0 +1,100 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { t, localePath } from '../../i18n';
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+
+const team = [
+  { icon: '📜', role: 'Historian', title: 'The Researcher', text: 'Gathers historical data, maintains a vast collection of tin soldiers and miniatures, and connects with collectors and professionals worldwide to ensure every detail is authentic.' },
+  { icon: '✏️', role: 'Sculptor', title: 'The Sculptor', text: 'Handcrafts each figure based on historical research, paintings, sculptures and photographs — capturing not only portrait likeness but exact uniforms, awards, insignia and even the subject\'s height.' },
+  { icon: '🏺', role: 'Modeling Master', title: 'The Modeler', text: 'Works with a proprietary blend of polymer clays, developing unique techniques to achieve the finest surface texture and anatomical accuracy.' },
+  { icon: '🔩', role: 'Molder & Caster', title: 'The Caster', text: 'Creates precision molds and casts from the finest time-tested alloys using safe, environmentally friendly materials.' },
+  { icon: '🎨', role: 'Artists', title: 'The Painters', text: 'Following the traditions of masters Jean Abell and Arturo Armesto, our artists paint each miniature using meticulous fine-detail techniques.' },
+  { icon: '🪵', role: 'Carpenter', title: 'The Carpenter', text: 'Crafts natural oak display cases finished with organic lacquers — oak being a sacred tree across Celtic, Germanic, Greek and Slavic traditions.' },
+  { icon: '🪡', role: 'Embroidery Master', title: 'The Embroiderer', text: 'Creates small cushion sachets from soft velvet, each bearing a miniature coloured coat of arms specific to the depicted figure.' },
+  { icon: '🖥️', role: 'Designers', title: 'The Designers', text: 'A graphic designer recreates historical logos and insignia; an embroidery specialist constructs heraldry in specialist software; a 3D designer creates the bases.' },
+];
+---
+<Layout
+  title="About the Studio — O.M.R Miniatures"
+  description="Meet the team behind O.M.R Miniatures — historians, sculptors, casters, painters and craftsmen united by a passion for history and the art of the miniature."
+  locale={locale}
+  canonical="https://omrminiatures.eu/about/"
+>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="section-label">{tr.about.title}</span>
+    <h1><em>The Studio</em></h1>
+    <p>{tr.about.subtitle}</p>
+  </div>
+</div>
+
+<!-- Mission -->
+<section class="section" style="background:var(--bg-2); border-bottom:1px solid var(--border);">
+  <div class="container" style="max-width:820px;">
+    <span class="section-label">Our Mission</span>
+    <h2 class="section-title">A New Brand in the World of Tin Miniatures</h2>
+    <div class="ornament">✠</div>
+    <p style="font-size:1.05rem;color:var(--mid);line-height:1.8;margin-bottom:20px;">
+      O.M.R Miniatures is an amateur project that brings together a team of history, art and craft enthusiasts. Our project centres on the <strong style="color:var(--white);">Belle Époque</strong> — that extraordinary period of European history from the 1880s to the outbreak of the First World War in 1914.
+    </p>
+    <p style="font-size:1.05rem;color:var(--mid);line-height:1.8;">
+      We chose 1904 as our reference year, and we depict the monarchs, aristocrats and military figures of that era with the greatest possible historical accuracy. All our figurines are works of art — researched, sculpted, cast and painted entirely by hand.
+    </p>
+  </div>
+</section>
+
+<!-- Team -->
+<section class="section" style="background:var(--bg);">
+  <div class="container">
+    <span class="section-label">{tr.about.team_title}</span>
+    <h2 class="section-title">The People Behind the Pieces</h2>
+    <div class="team-grid">
+      {team.map(member => (
+        <div class="team-card">
+          <div class="team-card-icon">{member.icon}</div>
+          <div class="team-card-role">{member.role}</div>
+          <div class="team-card-title">{member.title}</div>
+          <p>{member.text}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- Philosophy -->
+<section class="section" style="background:var(--bg-2); border-top:1px solid var(--border);">
+  <div class="container" style="max-width:820px;">
+    <span class="section-label">{tr.about.philosophy_title}</span>
+    <h2 class="section-title">On Oak and Craftsmanship</h2>
+    <div class="ornament">✠</div>
+    <p style="font-size:1.05rem;color:var(--mid);line-height:1.8;margin-bottom:20px;">
+      {tr.about.philosophy_text}
+    </p>
+  </div>
+</section>
+
+<!-- Quote -->
+<div class="quote-block" style="background:var(--bg); border-top:1px solid var(--border);">
+  <div class="container">
+    <blockquote>{tr.home.quote}</blockquote>
+    <cite>O.M.R Miniatures Studio</cite>
+  </div>
+</div>
+
+<!-- CTA -->
+<div style="background:var(--bg-2);border-top:1px solid var(--border);padding:64px 0;text-align:center;">
+  <div class="container">
+    <h3 style="font-family:var(--serif);font-style:italic;margin-bottom:16px;color:var(--white);font-size:2rem;">Interested in our work?</h3>
+    <p style="color:var(--mid);margin-bottom:28px;">Browse the catalog or get in touch to discuss a commission.</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href={lp('/catalog/')} class="btn btn-gold">{tr.nav.catalog}</a>
+      <a href={lp('/contact/')} class="btn btn-outline">{tr.nav.contact}</a>
+    </div>
+  </div>
+</div>
+
+</Layout>

@@ -1,0 +1,182 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { t, localePath, COLLECTION_LABELS, COUNTRY_LABELS } from '../../i18n';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../../keystatic.config';
+
+export async function getStaticPaths() {
+  const reader = createReader(process.cwd(), keystaticConfig);
+  const figurines = await reader.collections.figurines.all();
+  return figurines.map(f => ({ params: { slug: f.slug }, props: { entry: f.entry } }));
+}
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+const { slug } = Astro.params;
+const { entry } = Astro.props;
+
+const images = (entry.images ?? []) as string[];
+const hasVideo = !!entry.videoUrl;
+
+function getEmbedUrl(url: string) {
+  const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vm = url.match(/vimeo\.com\/(\d+)/);
+  if (vm) return `https://player.vimeo.com/video/${vm[1]}`;
+  return url;
+}
+---
+<Layout
+  title={`${entry.nameEn} — O.M.R Miniatures`}
+  description={entry.descriptionEn ?? `Handcrafted tin miniature — ${entry.nameEn}. ${COLLECTION_LABELS[entry.collection]} collection.`}
+  locale={locale}
+  canonical={`https://omrminiatures.eu/figurine/${slug}/`}
+  ogImage={images[0] ?? '/og-image.png'}
+>
+
+<article class="fig-detail">
+  <div class="container">
+    <a href={lp('/catalog/')} class="btn btn-ghost" style="display:inline-flex;margin-bottom:32px;">
+      ← {tr.figurine.back}
+    </a>
+
+    <div class="fig-detail-grid">
+      <!-- Gallery -->
+      <div class="fig-gallery">
+        <div class="fig-main-img" id="main-img">
+          {images[0]
+            ? <img src={images[0]} alt={entry.nameEn} id="main-img-el" />
+            : <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:4rem;">✠</div>
+          }
+        </div>
+        {images.length > 1 && (
+          <div class="fig-thumbs">
+            {images.map((img, i) => (
+              <button class:list={['fig-thumb', { active: i === 0 }]} data-img={img} data-index={i}>
+                <img src={img} alt={`${entry.nameEn} ${i+1}`} loading="lazy" />
+              </button>
+            ))}
+          </div>
+        )}
+        {hasVideo && (
+          <div class="fig-video-wrap" style="margin-top:16px;">
+            <iframe
+              src={getEmbedUrl(entry.videoUrl!)}
+              title={`${entry.nameEn} video`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+              loading="lazy"
+            ></iframe>
+          </div>
+        )}
+      </div>
+
+      <!-- Info -->
+      <div class="fig-meta">
+        <div class="fig-card-tags" style="margin-bottom:16px;">
+          <span class="fig-tag">{COLLECTION_LABELS[entry.collection]}</span>
+          {entry.countries?.map(c => <span class="fig-tag">{COUNTRY_LABELS[c]}</span>)}
+        </div>
+
+        {entry.available && (
+          <div class="available-badge">{tr.figurine.available}</div>
+        )}
+
+        <h1 style="font-style:italic; margin-bottom:8px; font-size:clamp(2rem,4vw,3.2rem);">{entry.nameEn}</h1>
+
+        <div class="ornament" style="margin: 20px 0;">✠</div>
+
+        {entry.descriptionEn && (
+          <p class="fig-description">{entry.descriptionEn}</p>
+        )}
+
+        <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:28px; padding:16px; background:var(--bg-3); border-radius:var(--r); border:1px solid var(--border);">
+          <div class="fig-meta-row">
+            <strong>{tr.figurine.collection}</strong>
+            <span>{COLLECTION_LABELS[entry.collection]}</span>
+          </div>
+          {entry.countries && entry.countries.length > 0 && (
+            <div class="fig-meta-row">
+              <strong>{tr.figurine.countries}</strong>
+              <span>{entry.countries.map(c => COUNTRY_LABELS[c]).join(', ')}</span>
+            </div>
+          )}
+          {entry.year && (
+            <div class="fig-meta-row">
+              <strong>Year</strong>
+              <span>{entry.year}</span>
+            </div>
+          )}
+        </div>
+
+        <div style="display:flex; gap:12px; flex-wrap:wrap;">
+          <button
+            class="btn btn-gold btn-wishlist-detail"
+            data-slug={slug}
+            data-name={entry.nameEn}
+            data-img={images[0] ?? ''}
+            data-collection={entry.collection}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            <span class="wl-label">{tr.figurine.add_wishlist}</span>
+          </button>
+          <a href={lp('/contact/')} class="btn btn-outline">{tr.figurine.inquire}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+</Layout>
+
+<script>
+// Thumbnail gallery
+document.querySelectorAll<HTMLButtonElement>('.fig-thumb').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const img = btn.dataset.img!;
+    const mainEl = document.querySelector<HTMLImageElement>('#main-img-el');
+    if (mainEl) mainEl.src = img;
+    document.querySelectorAll('.fig-thumb').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
+
+// Wishlist
+function getWishlist(): string[] {
+  try { return JSON.parse(localStorage.getItem('omr_wishlist') || '[]'); } catch { return []; }
+}
+function saveWishlist(wl: string[]) {
+  localStorage.setItem('omr_wishlist', JSON.stringify(wl));
+  window.dispatchEvent(new CustomEvent('wishlist-updated'));
+}
+
+const btn = document.querySelector<HTMLButtonElement>('.btn-wishlist-detail');
+if (btn) {
+  function syncBtn() {
+    const wl = getWishlist();
+    const inList = wl.includes(btn!.dataset.slug!);
+    btn!.classList.toggle('btn-outline', inList);
+    btn!.classList.toggle('btn-gold', !inList);
+    const label = btn!.querySelector<HTMLElement>('.wl-label');
+    if (label) label.textContent = inList ? 'In Wishlist' : 'Add to Wishlist';
+  }
+  btn.addEventListener('click', () => {
+    const slug = btn.dataset.slug!;
+    const wl = getWishlist();
+    const idx = wl.indexOf(slug);
+    if (idx === -1) {
+      wl.push(slug);
+      const meta = JSON.parse(localStorage.getItem('omr_wishlist_meta') || '{}');
+      meta[slug] = { name: btn.dataset.name, img: btn.dataset.img, collection: btn.dataset.collection };
+      localStorage.setItem('omr_wishlist_meta', JSON.stringify(meta));
+    } else {
+      wl.splice(idx, 1);
+    }
+    saveWishlist(wl);
+    syncBtn();
+  });
+  syncBtn();
+}
+</script>

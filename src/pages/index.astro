@@ -1,0 +1,143 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { t, localePath, COLLECTION_LABELS, COUNTRY_LABELS } from '../i18n';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../keystatic.config';
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const allFigurines = await reader.collections.figurines.all();
+const featured = allFigurines.filter(f => f.entry.featured).slice(0, 6);
+
+const collections = Object.entries(COLLECTION_LABELS);
+const countries = Object.entries(COUNTRY_LABELS).slice(0, 12);
+---
+<Layout
+  title="O.M.R Miniatures — The Belle Époque Art Project"
+  description="Unique handcrafted tin miniatures of European monarchs and aristocrats, 1880–1914. Eleven curated collections from O.M.R Miniatures Studio."
+  locale={locale}
+  canonical="https://omrminiatures.eu/"
+>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <img src="/hero.jpg" alt="" fetchpriority="high" />
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-label">{tr.home.hero_label}</div>
+      <h1>{tr.home.hero_title}<br /><em>from the Belle Époque</em></h1>
+      <p class="hero-sub">{tr.home.hero_sub}</p>
+      <div class="hero-actions">
+        <a href={lp('/catalog/')} class="btn btn-gold">{tr.home.hero_cta}</a>
+        <a href={lp('/about/')} class="btn btn-outline">{tr.home.hero_cta2}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-block" style="background: var(--bg-2); border-bottom: 1px solid var(--border);">
+  <div class="container">
+    <blockquote>{tr.home.quote}</blockquote>
+    <cite>O.M.R Miniatures Studio</cite>
+  </div>
+</div>
+
+<!-- COLLECTIONS -->
+<section class="section" style="background: var(--bg); padding-bottom: 0;">
+  <div class="container">
+    <span class="section-label">{tr.home.collections_label}</span>
+    <h2 class="section-title">{tr.home.collections_title}</h2>
+    <p class="section-sub">{tr.home.collections_sub}</p>
+  </div>
+</section>
+<div class="collection-grid" style="margin-top: 48px;">
+  {collections.map(([slug, label]) => (
+    <a href={lp(`/catalog/?collection=${slug}`)} class="collection-card">
+      <img src={`/collections/${slug}.jpg`} alt={label} loading="lazy" />
+      <div class="collection-card-label">
+        <small>Collection</small>
+        {label}
+      </div>
+    </a>
+  ))}
+</div>
+
+<!-- FEATURED -->
+{featured.length > 0 && (
+  <section class="section" style="background: var(--bg-2);">
+    <div class="container">
+      <span class="section-label">{tr.home.featured_label}</span>
+      <h2 class="section-title">{tr.home.featured_title}</h2>
+      <div class="figurine-grid" style="margin-top: 48px;">
+        {featured.map(fig => (
+          <a href={lp(`/figurine/${fig.slug}/`)} class="fig-card">
+            <div class="fig-card-img">
+              {fig.entry.images?.[0]
+                ? <img src={fig.entry.images[0] as string} alt={fig.entry.nameEn} loading="lazy" />
+                : <div style="width:100%;height:100%;background:var(--bg-3);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:2rem;">✠</div>
+              }
+            </div>
+            <div class="fig-card-body">
+              <div class="fig-card-tags">
+                <span class="fig-tag">{COLLECTION_LABELS[fig.entry.collection]}</span>
+              </div>
+              <div class="fig-card-name">{fig.entry.nameEn}</div>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div style="text-align:center; margin-top: 48px;">
+        <a href={lp('/catalog/')} class="btn btn-outline">{tr.home.hero_cta} →</a>
+      </div>
+    </div>
+  </section>
+)}
+
+<!-- COUNTRIES -->
+<section class="section" style="background: var(--bg);">
+  <div class="container">
+    <span class="section-label">{tr.home.countries_label}</span>
+    <h2 class="section-title">{tr.home.countries_title}</h2>
+    <p class="section-sub">{tr.home.countries_sub}</p>
+    <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:40px;">
+      {countries.map(([slug, label]) => (
+        <a href={lp(`/catalog/?country=${slug}`)} class="filter-chip">{label}</a>
+      ))}
+      <a href={lp('/catalog/')} class="filter-chip" style="border-style:dashed">See all →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT TEASER -->
+<section class="section" style="background: var(--bg-2); border-top: 1px solid var(--border);">
+  <div class="container">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center;">
+      <div>
+        <span class="section-label">{tr.home.about_label}</span>
+        <h2 class="section-title">{tr.home.about_title}</h2>
+        <div class="ornament">✠</div>
+        <p class="section-sub" style="max-width:none; margin-bottom:28px;">{tr.home.about_text}</p>
+        <a href={lp('/about/')} class="btn btn-outline">{tr.home.about_cta}</a>
+      </div>
+      <div style="position:relative; aspect-ratio:4/5; background:var(--bg-card); border-radius:4px; overflow:hidden;">
+        <img src="/about-studio.jpg" alt="O.M.R Miniatures Studio" loading="lazy"
+          style="width:100%;height:100%;object-fit:cover;opacity:0.8;" />
+      </div>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+@media (max-width: 768px) {
+  .about-grid { grid-template-columns: 1fr !important; }
+}
+</style>

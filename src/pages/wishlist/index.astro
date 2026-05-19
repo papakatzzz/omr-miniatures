@@ -1,0 +1,152 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { t, localePath } from '../../i18n';
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+---
+<Layout
+  title="Wishlist — O.M.R Miniatures"
+  description="Your selected pieces. Submit an inquiry to get availability and pricing."
+  locale={locale}
+  canonical="https://omrminiatures.eu/wishlist/"
+>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="section-label">{tr.wishlist.title}</span>
+    <h1><em>Your Selection</em></h1>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width:800px;">
+
+    <!-- Empty state (shown when JS not loaded or empty) -->
+    <div id="wishlist-empty" class="wishlist-empty">
+      <h3>{tr.wishlist.empty}</h3>
+      <p>{tr.wishlist.empty_sub}</p>
+      <a href={lp('/catalog/')} class="btn btn-gold">{tr.wishlist.browse}</a>
+    </div>
+
+    <!-- Filled state -->
+    <div id="wishlist-filled" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+        <h2 style="font-family:var(--serif);font-style:italic;font-size:1.4rem;color:var(--white);">
+          <span id="wishlist-count">0</span> pieces selected
+        </h2>
+        <button id="btn-clear" class="btn btn-ghost" style="font-size:0.7rem;">{tr.wishlist.clear}</button>
+      </div>
+
+      <div class="wishlist-items" id="wishlist-items"></div>
+
+      <div style="padding:40px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--r-lg);margin-top:8px;">
+        <h3 style="font-family:var(--serif);font-style:italic;font-size:1.6rem;margin-bottom:8px;color:var(--white);">{tr.wishlist.submit_title}</h3>
+        <p style="color:var(--mid);font-size:0.9rem;margin-bottom:28px;">{tr.wishlist.submit_sub}</p>
+
+        <div id="inquiry-success" style="display:none;padding:16px;background:rgba(110,231,160,0.08);border:1px solid rgba(110,231,160,0.2);border-radius:var(--r);color:#6ee7a0;margin-bottom:20px;">
+          Thank you! We will be in touch shortly.
+        </div>
+
+        <form id="inquiry-form" novalidate>
+          <div class="form-grid" style="margin-bottom:16px;">
+            <div class="field">
+              <label>Name</label>
+              <input type="text" name="name" placeholder="Your name" required />
+            </div>
+            <div class="field">
+              <label>Email</label>
+              <input type="email" name="email" placeholder="your@email.com" required />
+            </div>
+            <div class="field full">
+              <label>Message (optional)</label>
+              <textarea name="message" placeholder="Any additional notes…" style="min-height:80px;"></textarea>
+            </div>
+          </div>
+          <input type="hidden" name="items" id="items-field" />
+          <button type="submit" class="btn btn-gold" id="inquiry-submit">{tr.wishlist.submit}</button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</section>
+</Layout>
+
+<script>
+function getWishlist(): string[] {
+  try { return JSON.parse(localStorage.getItem('omr_wishlist') || '[]'); } catch { return []; }
+}
+function getMeta(): Record<string, { name: string; img: string; collection: string }> {
+  try { return JSON.parse(localStorage.getItem('omr_wishlist_meta') || '{}'); } catch { return {}; }
+}
+function saveWishlist(wl: string[]) {
+  localStorage.setItem('omr_wishlist', JSON.stringify(wl));
+  window.dispatchEvent(new CustomEvent('wishlist-updated'));
+}
+
+function render() {
+  const wl = getWishlist();
+  const meta = getMeta();
+  const empty = document.getElementById('wishlist-empty')!;
+  const filled = document.getElementById('wishlist-filled')!;
+
+  if (wl.length === 0) {
+    empty.style.display = '';
+    filled.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  filled.style.display = '';
+  document.getElementById('wishlist-count')!.textContent = String(wl.length);
+
+  const container = document.getElementById('wishlist-items')!;
+  container.innerHTML = wl.map(slug => {
+    const m = meta[slug] ?? {};
+    return `
+      <div class="wishlist-item">
+        <div class="wishlist-item-img">
+          ${m.img ? `<img src="${m.img}" alt="${m.name ?? slug}" />` : '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted);">✠</div>'}
+        </div>
+        <div>
+          <div class="wishlist-item-name">${m.name ?? slug}</div>
+          <div class="wishlist-item-meta">${m.collection ?? ''}</div>
+        </div>
+        <button class="btn btn-ghost btn-remove" data-slug="${slug}" style="font-size:0.7rem;color:var(--muted);">Remove</button>
+      </div>
+    `;
+  }).join('');
+
+  container.querySelectorAll<HTMLButtonElement>('.btn-remove').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const slug = btn.dataset.slug!;
+      const wl2 = getWishlist().filter(s => s !== slug);
+      saveWishlist(wl2);
+      render();
+    });
+  });
+
+  (document.getElementById('items-field') as HTMLInputElement).value =
+    wl.map(s => (meta[s]?.name ?? s)).join(', ');
+}
+
+render();
+window.addEventListener('wishlist-updated', render);
+
+document.getElementById('btn-clear')?.addEventListener('click', () => {
+  saveWishlist([]);
+  render();
+});
+
+document.getElementById('inquiry-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = document.getElementById('inquiry-submit') as HTMLButtonElement;
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  // TODO: wire up to actual email endpoint
+  await new Promise(r => setTimeout(r, 800));
+  (document.getElementById('inquiry-form') as HTMLFormElement).style.display = 'none';
+  (document.getElementById('inquiry-success') as HTMLElement).style.display = '';
+});
+</script>

@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { t, localePath } from '../../i18n';
+
+const locale = 'en';
+const tr = t(locale);
+---
+<Layout
+  title="Contact — O.M.R Miniatures"
+  description="Contact O.M.R Miniatures for orders, commissions or collaborations. Email: omrminiatures@gmail.com"
+  locale={locale}
+  canonical="https://omrminiatures.eu/contact/"
+>
+
+<div class="page-hero">
+  <div class="container">
+    <span class="section-label">{tr.contact.title}</span>
+    <h1><em>Get in Touch</em></h1>
+    <p>{tr.contact.subtitle}</p>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container" style="max-width:720px;">
+    <div id="contact-success" style="display:none; padding:24px; background:rgba(110,231,160,0.08); border:1px solid rgba(110,231,160,0.2); border-radius:var(--r); color:#6ee7a0; margin-bottom:32px;">
+      {tr.contact.success}
+    </div>
+
+    <form id="contact-form" novalidate>
+      <div class="form-grid">
+        <div class="field">
+          <label>{tr.contact.name}</label>
+          <input type="text" name="name" placeholder="Your name" required />
+        </div>
+        <div class="field">
+          <label>{tr.contact.email}</label>
+          <input type="email" name="email" placeholder="your@email.com" required />
+        </div>
+        <div class="field full">
+          <label>{tr.contact.message}</label>
+          <textarea name="message" placeholder="Describe your inquiry…"></textarea>
+        </div>
+      </div>
+      <div style="margin-top:20px;">
+        <button type="submit" class="btn btn-gold" id="contact-submit">{tr.contact.send}</button>
+      </div>
+    </form>
+
+    <div style="margin-top:64px; padding-top:48px; border-top:1px solid var(--border);">
+      <h3 style="font-family:var(--serif);font-style:italic;margin-bottom:24px;font-size:1.6rem;">{tr.contact.follow}</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <a href="mailto:omrminiatures@gmail.com" style="display:flex;align-items:center;gap:12px;color:var(--mid);font-size:0.95rem;transition:color 0.2s;">
+          <span style="color:var(--gold);">✉</span> omrminiatures@gmail.com
+        </a>
+        <a href="https://instagram.com/omrminiatures" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;color:var(--mid);font-size:0.95rem;transition:color 0.2s;">
+          <span style="color:var(--gold);">📷</span> @omrminiatures
+        </a>
+        <a href="https://facebook.com/druzhinin.k" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:12px;color:var(--mid);font-size:0.95rem;transition:color 0.2s;">
+          <span style="color:var(--gold);">f</span> druzhinin.k
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</Layout>
+
+<script>
+document.getElementById('contact-form')?.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const form = e.target as HTMLFormElement;
+  const btn = document.getElementById('contact-submit') as HTMLButtonElement;
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  // TODO: wire up to actual email endpoint
+  await new Promise(r => setTimeout(r, 800));
+  form.style.display = 'none';
+  (document.getElementById('contact-success') as HTMLElement).style.display = '';
+});
+</script>
