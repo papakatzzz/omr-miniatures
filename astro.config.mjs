@@ -4,16 +4,17 @@ import sitemap from '@astrojs/sitemap';
 import keystatic from '@keystatic/astro';
 import cloudflare from '@astrojs/cloudflare';
 
-// CF_PAGES=1 is injected automatically by Cloudflare Pages CI
-const isCloudflarePages = !!process.env.CF_PAGES;
+// production = npm run build (Cloudflare Pages + local builds)
+// development = astro dev (local dev server with Keystatic admin)
+const isProd = process.env.NODE_ENV === 'production';
 
 export default defineConfig({
   site: 'https://omrminiatures.eu',
-  output: isCloudflarePages ? 'static' : 'server',
-  adapter: isCloudflarePages ? undefined : cloudflare(),
+  output: isProd ? 'static' : 'server',
+  adapter: isProd ? undefined : cloudflare(),
   integrations: [
     sitemap(),
-    ...(!isCloudflarePages ? [keystatic()] : []),
+    ...(!isProd ? [keystatic()] : []),
   ],
   i18n: {
     defaultLocale: 'en',
