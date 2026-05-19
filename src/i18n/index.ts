@@ -269,7 +269,7 @@ export const COLLECTION_LABELS: Record<string, string> = {
   augustus: 'Augustus', basileus: 'Basileus', caesares: 'Caesares',
   dominus: 'Dominus', epistrategus: 'Epistrategus', fexillarius: 'Fexillarius',
   generalissimus: 'Generalissimus', honestior: 'Honestior', imperator: 'Imperator',
-  justiciarius: 'Justiciarius', komes: 'Komes',
+  justiciarius: 'Justiciarius', komes: 'Komes', legatus: 'Legatus',
 };
 
 export const COUNTRY_LABELS: Record<string, string> = {

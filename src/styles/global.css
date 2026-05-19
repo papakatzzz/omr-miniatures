@@ -285,13 +285,15 @@ h4 { font-size: 1.25rem; }
 
 /* ── Collection grid ── */
 .collection-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 2px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
 }
 .collection-card {
+  width: calc(16.666% - 14px);
   position: relative;
-  aspect-ratio: 3/4;
+  aspect-ratio: 4/5;
   overflow: hidden;
   background: var(--bg-card);
   cursor: pointer;
@@ -707,6 +709,7 @@ h4 { font-size: 1.25rem; }
   .fig-gallery { position: static; }
   .footer-inner { grid-template-columns: 1fr 1fr; }
   .footer-brand { grid-column: 1 / -1; }
+  .collection-card { width: calc(33.333% - 11px); }
 }
 @media (max-width: 640px) {
   .nav-links { display: none; }

@@ -41,32 +41,26 @@ const countries = Object.entries(COUNTRY_LABELS).slice(0, 12);
   </div>
 </section>
 
-<!-- QUOTE -->
-<div class="quote-block" style="background: var(--bg-2); border-bottom: 1px solid var(--border);">
-  <div class="container">
-    <blockquote>{tr.home.quote}</blockquote>
-    <cite>O.M.R Miniatures Studio</cite>
-  </div>
-</div>
-
 <!-- COLLECTIONS -->
-<section class="section" style="background: var(--bg); padding-bottom: 0;">
+<section class="section" style="background: var(--bg); padding-top: 48px; padding-bottom: 0;">
   <div class="container">
     <span class="section-label">{tr.home.collections_label}</span>
     <h2 class="section-title">{tr.home.collections_title}</h2>
     <p class="section-sub">{tr.home.collections_sub}</p>
   </div>
 </section>
-<div class="collection-grid" style="margin-top: 48px;">
-  {collections.map(([slug, label]) => (
-    <a href={lp(`/catalog/?collection=${slug}`)} class="collection-card">
-      <img src={`/collections/${slug}.jpg`} alt={label} loading="lazy" />
-      <div class="collection-card-label">
-        <small>Collection</small>
-        {label}
-      </div>
-    </a>
-  ))}
+<div class="container">
+  <div class="collection-grid" style="margin-top: 48px;">
+    {collections.map(([slug, label]) => (
+      <a href={lp(`/catalog/?collection=${slug}`)} class="collection-card">
+        <img src={`/collections/${slug}.jpg`} alt={label} loading="lazy" />
+        <div class="collection-card-label">
+          <small>Collection</small>
+          {label}
+        </div>
+      </a>
+    ))}
+  </div>
 </div>
 
 <!-- FEATURED -->

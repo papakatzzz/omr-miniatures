@@ -8,10 +8,17 @@
     "preview": "astro preview"
   },
   "dependencies": {
-    "astro": "^5.7.0",
     "@astrojs/cloudflare": "^12.3.0",
     "@astrojs/sitemap": "^3.2.1",
+    "@keystatic/astro": "^5.0.0",
     "@keystatic/core": "^0.5.40",
-    "@keystatic/astro": "^5.0.0"
+    "astro": "^5.7.0",
+    "d3-geo": "^3.1.1",
+    "topojson-client": "^3.1.0",
+    "world-atlas": "^2.0.2"
+  },
+  "devDependencies": {
+    "@types/d3-geo": "^3.1.0",
+    "@types/topojson-client": "^3.1.5"
   }
 }

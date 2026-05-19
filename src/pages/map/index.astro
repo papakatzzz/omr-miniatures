@@ -1,0 +1,113 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import EuropeMap from '../../components/EuropeMap.astro';
+import { t, localePath, COUNTRY_LABELS } from '../../i18n';
+import { createReader } from '@keystatic/core/reader';
+import keystaticConfig from '../../../keystatic.config';
+
+const locale = 'en';
+const tr = t(locale);
+const lp = (p: string) => localePath(locale, p);
+
+const reader = createReader(process.cwd(), keystaticConfig);
+const allFigurines = await reader.collections.figurines.all();
+
+const activeCountries = new Set<string>();
+for (const fig of allFigurines) {
+  for (const c of fig.entry.countries) {
+    activeCountries.add(c);
+  }
+}
+---
+
+<Layout
+  title="Explore by Empire — O.M.R Miniatures"
+  description="Discover our Belle Époque figurines through an interactive historical map of Europe, circa 1900."
+  locale={locale}
+  canonical="https://omrminiatures.eu/map/"
+>
+
+<section class="page-hero">
+  <div class="container">
+    <span class="section-label">Interactive</span>
+    <h1>Explore by Empire</h1>
+    <p>Click any highlighted territory to browse figurines from that country or empire.</p>
+  </div>
+</section>
+
+<section style="background: var(--bg); padding-top: 32px;">
+  <div class="container">
+
+    <!-- Map -->
+    <EuropeMap activeCountries={activeCountries} locale={locale} />
+    <!-- Legend -->
+    <div class="map-legend">
+      <span class="legend-item legend-item--active">Territory with figurines</span>
+      <span class="legend-item">No figurines yet</span>
+    </div>
+
+    <!-- Country chips fallback (also useful for mobile) -->
+    <div class="map-chips">
+      <p class="section-label" style="margin-bottom: 16px;">All territories</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+        {Object.entries(COUNTRY_LABELS).map(([slug, label]) => {
+          const active = activeCountries.has(slug);
+          return (
+            <a
+              href={active ? lp(`/catalog/?country=${slug}`) : '#'}
+              class:list={['filter-chip', { 'filter-chip--active': active, 'filter-chip--muted': !active }]}
+              aria-disabled={!active}
+            >
+              {label}
+            </a>
+          );
+        })}
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</Layout>
+
+<style>
+.map-legend {
+  display: flex;
+  gap: 24px;
+  margin-top: 20px;
+  align-items: center;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.legend-item::before {
+  content: '';
+  width: 16px; height: 10px;
+  border-radius: 2px;
+  background: #1a1814;
+  border: 1px solid #2e2b26;
+  flex-shrink: 0;
+}
+.legend-item--active { color: var(--gold); }
+.legend-item--active::before {
+  background: rgba(201, 165, 90, 0.25);
+  border-color: rgba(201, 165, 90, 0.5);
+}
+.map-chips {
+  margin-top: 48px;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+}
+.filter-chip--muted {
+  opacity: 0.35;
+  cursor: default;
+  pointer-events: none;
+}
+</style>
