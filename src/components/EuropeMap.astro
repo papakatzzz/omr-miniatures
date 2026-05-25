@@ -1,5 +1,5 @@
 ---
-import { geoMercator, geoPath } from 'd3-geo';
+import { geoNaturalEarth1, geoPath, geoGraticule } from 'd3-geo';
 import { feature, mesh, merge } from 'topojson-client';
 import worldAtlas from 'world-atlas/countries-50m.json';
 import { COUNTRY_LABELS } from '../i18n';
@@ -14,69 +14,225 @@ const lp = (p: string) => locale === 'en' ? p : `/${locale}${p}`;
 
 // ISO 3166-1 numeric → historical slug (~1900)
 const ISO_TO_SLUG: Record<number, string> = {
-  // Russian Empire
-  643: 'russian-empire', 616: 'russian-empire', 246: 'russian-empire',
-  233: 'russian-empire', 428: 'russian-empire', 440: 'russian-empire',
-  112: 'russian-empire', 804: 'russian-empire', 498: 'russian-empire',
-  // German Empire (country level — sub-states handled as markers)
-  276: 'german-empire',
-  // Austro-Hungarian Empire
-  40: 'austro-hungary', 348: 'austro-hungary', 203: 'austro-hungary',
-  703: 'austro-hungary', 705: 'austro-hungary', 191: 'austro-hungary', 70: 'austro-hungary',
-  // Ottoman State (Turkey; most Balkans already lost by 1900)
-  792: 'ottoman-state',
-  // Western
-  250: 'france',
-  826: 'united-kingdom', 372: 'united-kingdom',
+
+  // ── RUSSIAN EMPIRE ────────────────────────────────────────────────────────
+  643: 'russian-empire',  // Russia
+  616: 'russian-empire',  // Poland
+  246: 'russian-empire',  // Finland
+  233: 'russian-empire',  // Estonia
+  428: 'russian-empire',  // Latvia
+  440: 'russian-empire',  // Lithuania
+  112: 'russian-empire',  // Belarus
+  804: 'russian-empire',  // Ukraine
+  498: 'russian-empire',  // Moldova
+   51: 'russian-empire',  // Armenia
+   31: 'russian-empire',  // Azerbaijan
+  268: 'russian-empire',  // Georgia
+  398: 'russian-empire',  // Kazakhstan
+  417: 'russian-empire',  // Kyrgyzstan
+  762: 'russian-empire',  // Tajikistan
+  795: 'russian-empire',  // Turkmenistan
+  860: 'russian-empire',  // Uzbekistan
+
+  // ── GERMAN EMPIRE ─────────────────────────────────────────────────────────
+  276: 'german-empire',   // Germany
+  646: 'german-empire',   // Rwanda (German East Africa)
+  108: 'german-empire',   // Burundi (German East Africa)
+  516: 'german-empire',   // Namibia (German South-West Africa)
+  120: 'german-empire',   // Cameroon (German Kamerun)
+
+  // ── AUSTRO-HUNGARIAN EMPIRE ───────────────────────────────────────────────
+   40: 'austro-hungary',  // Austria
+  348: 'austro-hungary',  // Hungary
+  203: 'austro-hungary',  // Czech Republic
+  703: 'austro-hungary',  // Slovakia
+  705: 'austro-hungary',  // Slovenia
+  191: 'austro-hungary',  // Croatia
+   70: 'austro-hungary',  // Bosnia and Herzegovina
+
+  // ── OTTOMAN EMPIRE ────────────────────────────────────────────────────────
+  792: 'ottoman-state',   // Turkey
+  368: 'ottoman-state',   // Iraq
+  760: 'ottoman-state',   // Syria
+  422: 'ottoman-state',   // Lebanon
+  275: 'ottoman-state',   // Palestinian territories
+  400: 'ottoman-state',   // Jordan
+  682: 'ottoman-state',   // Saudi Arabia (Hejaz)
+  887: 'ottoman-state',   // Yemen
+  414: 'ottoman-state',   // Kuwait (Ottoman nominally)
+
+  // ── BRITISH EMPIRE ────────────────────────────────────────────────────────
+  826: 'united-kingdom',  // Great Britain
+  372: 'united-kingdom',  // Ireland
+  356: 'united-kingdom',  // India
+   50: 'united-kingdom',  // Bangladesh (part of British India)
+  144: 'united-kingdom',  // Sri Lanka (Ceylon)
+   36: 'united-kingdom',  // Australia
+  554: 'united-kingdom',  // New Zealand
+  124: 'united-kingdom',  // Canada
+  710: 'united-kingdom',  // South Africa
+  716: 'united-kingdom',  // Zimbabwe (Rhodesia)
+  818: 'united-kingdom',  // Egypt (British occupation from 1882)
+  404: 'united-kingdom',  // Kenya (British East Africa)
+  800: 'united-kingdom',  // Uganda
+  706: 'united-kingdom',  // Somalia (British Somaliland)
+  288: 'united-kingdom',  // Ghana (Gold Coast)
+  566: 'united-kingdom',  // Nigeria
+  694: 'united-kingdom',  // Sierra Leone
+  270: 'united-kingdom',  // Gambia
+  586: 'united-kingdom',  // Pakistan (part of British India)
+  524: 'united-kingdom',  // Nepal (British protectorate)
+  608: 'united-kingdom',  // Philippines (until 1898, then US)
+
+  // ── FRANCE ────────────────────────────────────────────────────────────────
+  250: 'france',           // Metropolitan France
+   12: 'france',           // Algeria
+  504: 'france',           // Morocco (French protectorate from 1912)
+  788: 'france',           // Tunisia
+  204: 'france',           // Benin (Dahomey)
+  854: 'france',           // Burkina Faso (Upper Volta)
+  384: 'france',           // Côte d'Ivoire
+  324: 'france',           // Guinea
+  466: 'france',           // Mali (French Sudan)
+  478: 'france',           // Mauritania
+  562: 'france',           // Niger
+  686: 'france',           // Senegal
+  140: 'france',           // Central African Republic (French Equatorial Africa)
+  178: 'france',           // Republic of Congo (French Congo)
+  266: 'france',           // Gabon
+  450: 'france',           // Madagascar
+  116: 'france',           // Cambodia (French Indochina)
+  418: 'france',           // Laos
+  704: 'france',           // Vietnam
+
+  // ── SPAIN ─────────────────────────────────────────────────────────────────
   724: 'spain',
+
+  // ── PORTUGAL ──────────────────────────────────────────────────────────────
   620: 'portugal',
+   24: 'portugal',         // Angola
+  508: 'portugal',         // Mozambique
+  624: 'portugal',         // Guinea-Bissau
+  132: 'portugal',         // Cape Verde
+  678: 'portugal',         // São Tomé and Príncipe
+  626: 'portugal',         // Timor-Leste
+
+  // ── ITALY ─────────────────────────────────────────────────────────────────
   380: 'italy',
-  // Scandinavia
-  752: 'sweden-norway', 578: 'sweden-norway',
-  // Benelux
-  56: 'belgium', 528: 'netherlands', 442: 'luxembourg',
-  // Balkans / smaller
+
+  // ── SCANDINAVIA (Sweden–Norway union until 1905) ──────────────────────────
+  752: 'sweden-norway',    // Sweden
+  578: 'sweden-norway',    // Norway
+
+  // ── BENELUX ───────────────────────────────────────────────────────────────
+   56: 'belgium',
+  180: 'belgium',          // Congo (Congo Free State / Leopold II)
+  528: 'netherlands',
+  442: 'luxembourg',
+
+  // ── NORTHERN EUROPE ───────────────────────────────────────────────────────
   208: 'denmark',
+  352: 'denmark',          // Iceland (Danish crown)
+  304: 'denmark',          // Greenland
+
+  // ── BALKANS / SMALLER EUROPEAN ────────────────────────────────────────────
   642: 'romania',
   100: 'bulgaria',
   688: 'serbia',
   300: 'greece',
   499: 'montenegro',
-  8: 'albania',
+    8: 'albania',
+  756: 'switzerland',
+
+  // ── UNITED STATES ─────────────────────────────────────────────────────────
+  840: 'united-states',
+  630: 'united-states',    // Puerto Rico (from 1898)
+
+  // ── JAPAN (Meiji Era) ─────────────────────────────────────────────────────
+  392: 'japan',
+  158: 'japan',            // Taiwan (from 1895)
+  410: 'japan',            // Korea (protectorate from 1905)
+
+  // ── QING DYNASTY (China) ──────────────────────────────────────────────────
+  156: 'qing-dynasty',
+  496: 'qing-dynasty',     // Mongolia (under Qing)
+
+  // ── PERSIA ────────────────────────────────────────────────────────────────
+  364: 'persia',
+
+  // ── AFGHANISTAN ───────────────────────────────────────────────────────────
+    4: 'afghanistan',
+
+  // ── SIAM (Thailand — independent buffer state) ────────────────────────────
+  764: 'siam',
+
+  // ── INDEPENDENT AFRICAN STATES ────────────────────────────────────────────
+  231: 'ethiopia',
+  430: 'liberia',
+
+  // ── LATIN AMERICA ─────────────────────────────────────────────────────────
+   32: 'argentina',
+   68: 'bolivia',
+   76: 'brazil',
+  152: 'chile',
+  170: 'colombia',
+  188: 'costa-rica',
+  192: 'cuba',
+  214: 'dominican-republic',
+  218: 'ecuador',
+  222: 'el-salvador',
+  320: 'guatemala',
+  332: 'haiti',
+  340: 'honduras',
+  484: 'mexico',
+  558: 'nicaragua',
+  591: 'panama',
+  600: 'paraguay',
+  604: 'peru',
+  858: 'uruguay',
+  862: 'venezuela',
 };
 
 // Per-ISO overrides: specific sub-features get their own coat of arms
 const ISO_TO_HERALDRY: Record<number, string> = {
-  826: 'United%20Kingdom.png', // Great Britain
-  372: 'United%20Kingdom.png', // Ireland
+  826: 'United%20Kingdom.png',
+  372: 'United%20Kingdom.png',
 };
 
 // Slug → actual filename in /public/flags/
 const SLUG_TO_FILE: Record<string, string> = {
-  'united-kingdom':  'United%20Kingdom.png',
-  'russian-empire':  'Russia.png',
-  'france':          'France.png',
-  'german-empire':   'German%20Empire.png',
-  'austro-hungary':  'Austria-Hungary.png',
-  'ottoman-state':   'Ottoman%20Empire.png',
-  'spain':           'spain.png',
-  'portugal':        'Portugal.png',
-  'italy':           'Italy.png',
-  'sweden-norway':   'Sweden%20and%20Norway.png',
-  'belgium':         'Belgium.png',
-  'netherlands':     'Netherlands.png',
-  'luxembourg':      'Luxembourg.png',
-  'denmark':         'Denmark.png',
-  'romania':         'Romania.png',
-  'bulgaria':        'Bulgaria.png',
-  'serbia':          'Serbia.png',
-  'greece':          'Greece.png',
-  'montenegro':      'Montenegro.png',
-  'bavaria':         'Bavaria.png',
-  'saxony':          'Saxony.png',
-  'württemberg':     'W%C3%BCrttemberg.png',
-  'baden':           'Baden.png',
-  'order-of-malta':  'Knights%20of%20Saint%20John.png',
+  // European powers
+  'united-kingdom':   'United%20Kingdom.png',
+  'russian-empire':   'Russia.png',
+  'france':           'France.png',
+  'german-empire':    'German%20Empire.png',
+  'austro-hungary':   'Austria-Hungary.png',
+  'ottoman-state':    'Ottoman%20Empire.png',
+  'spain':            'spain.png',
+  'portugal':         'Portugal.png',
+  'italy':            'Italy.png',
+  'sweden-norway':    'Sweden%20and%20Norway.png',
+  'belgium':          'Belgium.png',
+  'netherlands':      'Netherlands.png',
+  'luxembourg':       'Luxembourg.png',
+  'denmark':          'Denmark.png',
+  'romania':          'Romania.png',
+  'bulgaria':         'Bulgaria.png',
+  'serbia':           'Serbia.png',
+  'greece':           'Greece.png',
+  'montenegro':       'Montenegro.png',
+  // German sub-states
+  'bavaria':          'Bavaria.png',
+  'saxony':           'Saxony.png',
+  'württemberg':      'W%C3%BCrttemberg.png',
+  'baden':            'Baden.png',
+  'order-of-malta':   'Knights%20of%20Saint%20John.png',
+  // World powers
+  'united-states':    'United%20States.png',
+  'japan':            'Japan.png',
+  'qing-dynasty':     'Qing%20Dynasty.png',
+  'persia':           'Persia.png',
+  'ethiopia':         'Ethiopia.png',
 };
 
 // German sub-states: shown as dot markers within German Empire territory
@@ -87,15 +243,17 @@ const GERMAN_STATES: { slug: string; lon: number; lat: number }[] = [
   { slug: 'baden',        lon:  8.1, lat: 48.3 },
 ];
 
-const W = 960, H = 600;
+const W = 960, H = 540;
 
-const projection = geoMercator()
-  .scale(680)
-  .center([15, 52])
-  .translate([W / 2, H / 2])
-  .clipExtent([[0, 0], [W, H]]);
+// Natural Earth — ideal for world historical maps (used by National Geographic)
+const projection = geoNaturalEarth1()
+  .fitSize([W, H], { type: 'Sphere' });
 
 const pathGen = geoPath(projection);
+const graticule = geoGraticule();
+const graticulePath = pathGen(graticule()) ?? '';
+const spherePath = pathGen({ type: 'Sphere' }) ?? '';
+
 const countries = feature(worldAtlas as any, (worldAtlas as any).objects.countries);
 
 // Merge SVG paths per slug
@@ -106,6 +264,14 @@ for (const f of countries.features) {
   const d = pathGen(f);
   if (!d) continue;
   slugPaths.set(slug, (slugPaths.get(slug) ?? '') + ' ' + d);
+}
+
+// Unmapped countries (shown as neutral grey)
+const unmappedPaths: string[] = [];
+for (const f of countries.features) {
+  if (ISO_TO_SLUG[Number(f.id)]) continue;
+  const d = pathGen(f);
+  if (d) unmappedPaths.push(d);
 }
 
 // Project German state centers to SVG coords
@@ -132,7 +298,7 @@ for (const [slug, geoms] of slugGeoms.entries()) {
   if (d) slugOutlines.set(slug, d);
 }
 
-// Bounding box per slug for pattern sizing (cover the full country area)
+// Bounding box per slug for pattern sizing
 const slugBounds = new Map<string, [number, number, number, number]>();
 for (const [slug, geoms] of slugGeoms.entries()) {
   const merged = merge(worldAtlas as any, geoms);
@@ -140,7 +306,7 @@ for (const [slug, geoms] of slugGeoms.entries()) {
   if (!isNaN(x0)) slugBounds.set(slug, [Math.floor(x0), Math.floor(y0), Math.ceil(x1), Math.ceil(y1)]);
 }
 
-// Per-ISO bounds and paths for sub-feature overrides (e.g. UK → GB + Ireland separately)
+// Per-ISO bounds and paths for sub-feature overrides
 type IsoHeraldry = { iso: number; d: string; file: string; b: [number,number,number,number] };
 const isoHeraldryBySlug = new Map<string, IsoHeraldry[]>();
 for (const f of countries.features) {
@@ -161,7 +327,7 @@ const entries = Array.from(slugPaths.entries());
 
 const obj = (worldAtlas as any).objects.countries;
 
-// Interior borders: between two features that belong to the SAME slug (e.g. inside Austro-Hungary)
+// Interior borders: between features that belong to the same slug
 const interiorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   if (a === b) return false;
   const sA = ISO_TO_SLUG[Number(a.id)];
@@ -169,28 +335,27 @@ const interiorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   return !!sA && !!sB && sA === sB;
 }));
 
-// Exterior borders: coastlines + borders between different slugs
+// Exterior borders: coastlines + borders between different territories
 const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   const sA = ISO_TO_SLUG[Number(a.id)];
   const sB = ISO_TO_SLUG[Number(b.id)];
-  if (a === b) return !!sA; // coastline of our territory
-  return sA !== sB && (!!sA || !!sB); // border between different territories
+  if (a === b) return !!sA;
+  return sA !== sB && (!!sA || !!sB);
 }));
 ---
 
 <div class="map-wrapper">
   <svg
     viewBox={`0 0 ${W} ${H}`}
-    class="europe-map"
+    class="world-map"
     role="img"
-    aria-label="Interactive map of Belle Époque Europe"
+    aria-label="Interactive world map of Belle Époque era (~1900)"
   >
     <defs>
       <filter id="map-glow" x="-20%" y="-20%" width="140%" height="140%">
         <feGaussianBlur stdDeviation="4" result="blur"/>
         <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
-      <!-- Makes near-white pixels transparent; white(1,1,1) → alpha=0 -->
       <filter id="heraldry-filter" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix"
           values="1 0 0 0 0
@@ -198,12 +363,12 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
                   0 0 1 0 0
                   -5 -5 -5 15 0"/>
       </filter>
-      <clipPath id="europe-clip">
-        <rect width={W} height={H} />
+      <clipPath id="world-clip">
+        <path d={spherePath} />
       </clipPath>
       {Array.from(slugBounds.entries()).map(([slug, [x0, y0, x1, y1]]) => {
         const file = SLUG_TO_FILE[slug];
-        if (!file || isoHeraldryBySlug.has(slug)) return null; // skip if handled per-ISO
+        if (!file || isoHeraldryBySlug.has(slug)) return null;
         const w = x1 - x0, h = y1 - y0;
         return (
           <pattern id={`flag-${slug}`} patternUnits="userSpaceOnUse"
@@ -230,65 +395,75 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
       })}
     </defs>
 
-    <!-- Ocean -->
-    <rect width={W} height={H} class="map-ocean" rx="4"/>
+    <!-- Ocean sphere -->
+    <path d={spherePath} class="map-ocean" />
 
-    <g clip-path="url(#europe-clip)">
+    <g clip-path="url(#world-clip)">
 
-    <!-- Country / empire regions -->
-    {entries.map(([slug, d]) => {
-      const active = activeCountries.has(slug);
-      const label = COUNTRY_LABELS[slug] ?? slug;
-      const href = lp(`/catalog/?country=${slug}`);
-      return (
-        <a
-          href={active ? href : undefined}
-          class:list={['map-country', { 'map-country--active': active }]}
-          data-slug={slug}
-          data-label={label}
-          aria-label={label}
-          tabindex={active ? '0' : '-1'}
-        >
-          <path d={d} class="map-fill" />
-          {isoHeraldryBySlug.has(slug)
-            ? isoHeraldryBySlug.get(slug)!.map(({ iso, d: id }) =>
-                <path d={id} class="map-heraldry" style={`fill: url(#flag-iso-${iso})`} />
-              )
-            : SLUG_TO_FILE[slug] && <path d={d} class="map-heraldry" style={`fill: url(#flag-${slug})`} />
-          }
-        </a>
-      );
-    })}
+      <!-- Graticule (lat/lon grid lines) -->
+      <path d={graticulePath} class="map-graticule" />
 
-    <!-- Border layers (rendered on top of fills, pointer-events: none) -->
-    {interiorD && <path d={interiorD} class="map-border-interior" />}
-    {exteriorD && <path d={exteriorD} class="map-border-exterior" />}
+      <!-- Unmapped / neutral countries -->
+      {unmappedPaths.map(d => <path d={d} class="map-neutral" />)}
 
-    <!-- Hover outlines — separate top layer so filter on heraldry doesn't interfere -->
-    <g id="map-outline-layer" pointer-events="none">
-      {Array.from(slugOutlines.entries()).map(([slug, d]) => (
-        <path d={d} class="map-outline" data-slug={slug} />
-      ))}
+      <!-- Country / empire regions -->
+      {entries.map(([slug, d]) => {
+        const active = activeCountries.has(slug);
+        const label = COUNTRY_LABELS[slug] ?? slug;
+        const href = lp(`/catalog/?country=${slug}`);
+        return (
+          <a
+            href={active ? href : undefined}
+            class:list={['map-country', { 'map-country--active': active }]}
+            data-slug={slug}
+            data-label={label}
+            aria-label={label}
+            tabindex={active ? '0' : '-1'}
+          >
+            <path d={d} class="map-fill" />
+            {isoHeraldryBySlug.has(slug)
+              ? isoHeraldryBySlug.get(slug)!.map(({ iso, d: id }) =>
+                  <path d={id} class="map-heraldry" style={`fill: url(#flag-iso-${iso})`} />
+                )
+              : SLUG_TO_FILE[slug] && <path d={d} class="map-heraldry" style={`fill: url(#flag-${slug})`} />
+            }
+          </a>
+        );
+      })}
+
+      <!-- Border layers -->
+      {interiorD && <path d={interiorD} class="map-border-interior" />}
+      {exteriorD && <path d={exteriorD} class="map-border-exterior" />}
+
+      <!-- Hover outlines -->
+      <g id="map-outline-layer" pointer-events="none">
+        {Array.from(slugOutlines.entries()).map(([slug, d]) => (
+          <path d={d} class="map-outline" data-slug={slug} />
+        ))}
+      </g>
+
+      <!-- German sub-state dot markers -->
+      {stateMarkers.map(m => {
+        const active = activeCountries.has(m.slug);
+        const label = COUNTRY_LABELS[m.slug] ?? m.slug;
+        return (
+          <a
+            href={active ? lp(`/catalog/?country=${m.slug}`) : undefined}
+            class:list={['map-state-marker', { 'map-state-marker--active': active }]}
+            data-slug={m.slug}
+            data-label={label}
+            aria-label={label}
+          >
+            <circle cx={m.x} cy={m.y} r="4"/>
+          </a>
+        );
+      })}
+
     </g>
 
-    <!-- German sub-state dot markers -->
-    {stateMarkers.map(m => {
-      const active = activeCountries.has(m.slug);
-      const label = COUNTRY_LABELS[m.slug] ?? m.slug;
-      return (
-        <a
-          href={active ? lp(`/catalog/?country=${m.slug}`) : undefined}
-          class:list={['map-state-marker', { 'map-state-marker--active': active }]}
-          data-slug={m.slug}
-          data-label={label}
-          aria-label={label}
-        >
-          <circle cx={m.x} cy={m.y} r="5"/>
-        </a>
-      );
-    })}
+    <!-- Sphere outline (drawn on top for clean edge) -->
+    <path d={spherePath} class="map-sphere-outline" />
 
-    </g>
   </svg>
 
   <!-- Tooltip -->
@@ -298,17 +473,36 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 <style>
 .map-wrapper {
   position: relative;
-  width: min(100%, calc((100svh - 130px) * 960 / 600));
-  aspect-ratio: 960 / 600;
+  width: min(100%, calc((100svh - 130px) * 960 / 540));
+  aspect-ratio: 960 / 540;
   margin: 0 auto;
   overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 4px;
 }
 
-.europe-map { width: 100%; height: 100%; display: block; }
+.world-map { width: 100%; height: 100%; display: block; }
 
 .map-ocean { fill: #1a3a5c; }
+
+.map-sphere-outline {
+  fill: none;
+  stroke: #2a4a6c;
+  stroke-width: 1;
+}
+
+/* Graticule grid */
+.map-graticule {
+  fill: none;
+  stroke: #1e3f60;
+  stroke-width: 0.4;
+  pointer-events: none;
+}
+
+/* Neutral / unmapped countries */
+.map-neutral {
+  fill: #2a2820;
+  stroke: #1e1c18;
+  stroke-width: 0.3;
+}
 
 /* Country fill */
 .map-fill {
@@ -318,7 +512,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 .map-country .map-fill { fill: #3a3628; }
 .map-country--active .map-fill { fill: rgba(201, 165, 90, 0.55); }
 
-/* Coat of arms / flag overlay — feColorMatrix removes white BG, keeps actual colors */
+/* Coat of arms / flag overlay */
 .map-heraldry {
   opacity: 0.20;
   filter: url(#heraldry-filter);
@@ -334,11 +528,11 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   filter: url(#heraldry-filter) brightness(1.1);
 }
 
-/* Hover outlines — top layer, shown via JS class */
+/* Hover outlines */
 .map-outline {
   fill: none;
   stroke: transparent;
-  stroke-width: 2.5;
+  stroke-width: 2;
   pointer-events: none;
   transition: stroke 0.15s;
 }
@@ -357,13 +551,13 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 .map-border-interior {
   fill: none;
   stroke: #2a2820;
-  stroke-width: 0.4;
+  stroke-width: 0.3;
   pointer-events: none;
 }
 .map-border-exterior {
   fill: none;
   stroke: #4a4030;
-  stroke-width: 1.2;
+  stroke-width: 0.8;
   pointer-events: none;
 }
 
@@ -408,7 +602,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 {
   const wrapper = document.querySelector<HTMLElement>('.map-wrapper');
   const tooltip = document.getElementById('map-tooltip');
-  const svg = document.querySelector<SVGSVGElement>('.europe-map');
+  const svg = document.querySelector<SVGSVGElement>('.world-map');
   if (!wrapper || !tooltip || !svg) throw new Error('map elements missing');
 
   let hovered: SVGElement | null = null;
