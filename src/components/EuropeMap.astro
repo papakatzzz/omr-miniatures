@@ -539,88 +539,87 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 </div>
 
 <style>
-/* ── Wrapper — EU4/HOI4 dark strategy game frame ─────────────────────────── */
+/* ── Wrapper — EU4-style frame, light map on dark page ───────────────────── */
 .map-wrapper {
   position: relative;
   width: min(100%, calc((100svh - 130px) * 960 / 540));
   aspect-ratio: 960 / 540;
   margin: 0 auto;
   overflow: hidden;
-  background: #0a0e14;
-  border: 2px solid #2a3848;
+  background: #5a7a90;
+  /* Decorative gold frame — separates map from dark page */
+  border: 3px solid #8a6830;
+  outline: 1px solid #c8a050;
+  outline-offset: -6px;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px #111820, 0 6px 32px rgba(0,0,0,0.7);
+  box-shadow:
+    0 0 0 6px #1a1410,
+    0 8px 40px rgba(0,0,0,0.8),
+    inset 0 0 60px rgba(0,0,0,0.25);
 }
 
-/* Radial vignette overlay — darkens edges like EU4 */
+/* Subtle vignette — only darkens edges slightly */
 .map-wrapper::after {
   content: '';
   position: absolute;
   inset: 0;
   background: radial-gradient(ellipse at 50% 50%,
-    transparent 45%,
-    rgba(0,0,0,0.55) 100%);
+    transparent 55%,
+    rgba(0,0,0,0.35) 100%);
   pointer-events: none;
   z-index: 2;
 }
 
-.world-map {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+.world-map { width: 100%; height: 100%; display: block; }
 
-/* Ocean — deep navy, EU4 style */
-.map-ocean { fill: #162030; }
+/* Ocean — medium warm blue, like EU4 */
+.map-ocean { fill: #4a7898; }
 
 /* Sphere outline */
 .map-sphere-outline {
   fill: none;
-  stroke: #203040;
-  stroke-width: 1.5;
+  stroke: #3a6080;
+  stroke-width: 1;
 }
 
-/* Graticule — very subtle, barely visible like EU4 */
+/* Graticule — subtle */
 .map-graticule {
   fill: none;
-  stroke: #203040;
+  stroke: #3a6070;
   stroke-width: 0.4;
   pointer-events: none;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
-/* Neutral / unmapped — dark olive */
+/* Neutral / unmapped — warm earthy olive, like EU4 wasteland */
 .map-neutral {
-  fill: #222818;
-  stroke: #1a2010;
+  fill: #7a7050;
+  stroke: #5a5038;
   stroke-width: 0.3;
 }
 
 /* ── Country fills ─────────────────────────────────────────────────────────
-   CSS custom property --c is set per <a> element in the template.
-   Active countries: full vivid colour.
-   Inactive: desaturated + darkened (EU4 "greyed out" territories).        */
+   --c is set per element. Active = full vivid. Inactive = slightly muted.  */
 .map-fill {
-  fill: var(--c, #3a4858);
+  fill: var(--c, #607080);
   stroke: none;
   transition: filter 0.15s;
 }
 
+/* Inactive: only lightly muted — map looks good even with empty catalog */
 .map-country:not(.map-country--active) .map-fill {
-  filter: saturate(0.35) brightness(0.65);
+  filter: saturate(0.6) brightness(0.82);
 }
-
 .map-country:not(.map-country--active).map-js-hover .map-fill {
-  filter: saturate(0.55) brightness(0.80);
+  filter: saturate(0.75) brightness(0.92);
 }
-
 .map-country--active.map-js-hover .map-fill {
-  filter: saturate(1.2) brightness(1.18);
+  filter: saturate(1.15) brightness(1.15);
 }
 
 /* ── Heraldry overlay ──────────────────────────────────────────────────── */
 .map-heraldry {
-  opacity: 0.08;
+  opacity: 0.10;
   filter: url(#heraldry-filter);
   pointer-events: none;
   transition: opacity 0.25s, filter 0.25s;
@@ -630,11 +629,11 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   filter: url(#heraldry-filter);
 }
 .map-country--active.map-js-hover .map-heraldry {
-  opacity: 0.6;
+  opacity: 0.62;
   filter: url(#heraldry-filter) brightness(1.1);
 }
 
-/* ── Hover outline — bright gold/white glow like EU4 selection ──────────── */
+/* ── Hover outline — gold glow ──────────────────────────────────────────── */
 .map-outline {
   fill: none;
   stroke: transparent;
@@ -643,7 +642,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   transition: stroke 0.12s, filter 0.12s;
 }
 .map-outline.map-js-hover {
-  stroke: rgba(255, 220, 100, 0.9);
+  stroke: rgba(255, 220, 80, 0.95);
   filter: url(#map-glow);
 }
 
@@ -653,27 +652,27 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 
 .map-border-interior {
   fill: none;
-  stroke: rgba(0, 0, 0, 0.5);
+  stroke: rgba(0,0,0,0.4);
   stroke-width: 0.4;
   pointer-events: none;
 }
 .map-border-exterior {
   fill: none;
-  stroke: rgba(0, 0, 0, 0.75);
-  stroke-width: 1.2;
+  stroke: rgba(0,0,0,0.65);
+  stroke-width: 1.1;
   pointer-events: none;
 }
 
 /* ── German sub-state dots ──────────────────────────────────────────────── */
 .map-state-marker circle {
-  fill: #3a5878;
-  stroke: #1a3050;
+  fill: #5878a0;
+  stroke: #384870;
   stroke-width: 1.2;
   transition: filter 0.15s;
 }
 .map-state-marker--active circle {
-  fill: #4a70c0;
-  stroke: #2a5098;
+  fill: #5888d0;
+  stroke: #3860a8;
 }
 .map-state-marker { outline: none; }
 .map-state-marker--active { cursor: pointer; }
@@ -681,12 +680,12 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   filter: brightness(1.3);
 }
 
-/* ── Tooltip — dark game UI style ───────────────────────────────────────── */
+/* ── Tooltip — dark UI panel ────────────────────────────────────────────── */
 .map-tooltip {
   position: absolute;
-  background: rgba(10, 16, 26, 0.95);
-  border: 1px solid rgba(180, 150, 60, 0.7);
-  color: #e8d898;
+  background: rgba(12, 18, 28, 0.96);
+  border: 1px solid rgba(180, 148, 50, 0.8);
+  color: #e8d890;
   font-family: var(--sans);
   font-size: 0.70rem;
   letter-spacing: 0.08em;
@@ -698,7 +697,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   transition: opacity 0.1s;
   white-space: nowrap;
   z-index: 10;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,220,80,0.08);
+  box-shadow: 0 3px 14px rgba(0,0,0,0.7);
 }
 </style>
 
