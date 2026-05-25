@@ -193,69 +193,69 @@ const ISO_TO_SLUG: Record<number, string> = {
   862: 'venezuela',
 };
 
-// Vintage pastel colour per slug (~1900 political map palette)
+// EU4 / HOI4 / CK-inspired colours — vibrant, saturated political map palette
 const SLUG_TO_COLOR: Record<string, string> = {
-  // European powers
-  'russian-empire':     '#e8a878',  // warm salmon-orange
-  'united-kingdom':     '#e8a0a8',  // rose pink
-  'france':             '#c8a8d8',  // lavender-purple
-  'german-empire':      '#b0c888',  // sage green
-  'austro-hungary':     '#f0d878',  // warm yellow
-  'ottoman-state':      '#c8b078',  // tan-khaki
-  'italy':              '#98b8d0',  // steel blue
-  'spain':              '#c0d898',  // light green
-  'portugal':           '#e0b888',  // warm peach
-  'sweden-norway':      '#a8c8e0',  // pale blue
-  'belgium':            '#d8b888',  // cream tan
-  'netherlands':        '#b8d0b8',  // pale green
-  'denmark':            '#c8a8c8',  // pale mauve
-  'luxembourg':         '#e8d890',  // pale yellow
-  'switzerland':        '#d0c8b8',  // warm grey
-  'romania':            '#d0b890',  // warm beige
-  'bulgaria':           '#c8b898',  // light tan
-  'serbia':             '#c0b0a0',  // warm grey
-  'greece':             '#90c0c8',  // teal-blue
-  'montenegro':         '#b8a898',  // warm grey
-  'albania':            '#c8b8a8',  // beige
-  // German sub-states (same green family)
-  'bavaria':            '#b0c888',
-  'saxony':             '#b0c888',
-  'württemberg':        '#b0c888',
-  'baden':              '#b0c888',
-  // World powers
-  'united-states':      '#e8b890',  // warm peach-orange
-  'japan':              '#f0c060',  // golden-yellow
-  'qing-dynasty':       '#e0d098',  // pale yellow-cream
-  'persia':             '#d8a8b0',  // dusty rose
-  'afghanistan':        '#c8b890',  // khaki
-  'siam':               '#a8c898',  // pale green
-  'ethiopia':           '#b8a880',  // olive tan
-  'liberia':            '#c0b098',  // warm tan
-  // Latin America
-  'argentina':          '#a0c8b8',  // pale teal
-  'brazil':             '#a8c880',  // light green
-  'chile':              '#b0b8d0',  // blue-grey
-  'colombia':           '#d8b898',  // peach
-  'mexico':             '#e8c888',  // pale gold
-  'peru':               '#c8a890',  // warm tan
-  'venezuela':          '#b8c890',  // sage
-  'bolivia':            '#c8b888',  // khaki
-  'ecuador':            '#b0d0a0',  // light green
-  'paraguay':           '#d0c098',  // warm cream
-  'uruguay':            '#b8c0d0',  // lavender-grey
-  'cuba':               '#e0c0a0',  // warm peach
-  'haiti':              '#b8a898',  // warm grey
-  'dominican-republic': '#c8b8a8',  // warm grey
-  'guatemala':          '#b8c898',  // sage green
-  'honduras':           '#c0c898',  // pale sage
-  'el-salvador':        '#c8c090',  // warm sage
-  'nicaragua':          '#b0c090',  // pale sage
-  'costa-rica':         '#a8c0a8',  // pale green
-  'panama':             '#b0b898',  // pale green-grey
-  'order-of-malta':     '#e8d0b0',
+  // ── Major European powers ───────────────────────────────────────────────
+  'russian-empire':     '#4a8c38',  // Muscovite / Russian green
+  'united-kingdom':     '#b82828',  // British crimson red
+  'france':             '#3060b8',  // French royal blue
+  'german-empire':      '#5878b0',  // Prussian steel-blue
+  'austro-hungary':     '#a83030',  // Habsburg deep red
+  'ottoman-state':      '#2a9080',  // Ottoman teal
+  'italy':              '#38a050',  // Italian green
+  'spain':              '#c8a018',  // Castilian gold
+  'portugal':           '#207838',  // Portuguese forest green
+  'sweden-norway':      '#d0b020',  // Swedish gold-yellow
+  'belgium':            '#d05818',  // Belgian orange-red
+  'netherlands':        '#e07820',  // Dutch bright orange
+  'denmark':            '#b01818',  // Danish red
+  'luxembourg':         '#c8901c',  // Luxembourg orange-gold
+  'switzerland':        '#c82828',  // Swiss red
+  'romania':            '#2858a8',  // Romanian blue
+  'bulgaria':           '#3878b0',  // Bulgarian blue
+  'serbia':             '#c82828',  // Serbian red
+  'greece':             '#1878b0',  // Greek blue
+  'montenegro':         '#8838a8',  // Montenegrin purple
+  'albania':            '#c83818',  // Albanian red
+  // German sub-states — slightly lighter than main empire
+  'bavaria':            '#4870c0',
+  'saxony':             '#4060a8',
+  'württemberg':        '#3858a0',
+  'baden':              '#3050a0',
+  // ── World powers ─────────────────────────────────────────────────────────
+  'united-states':      '#305898',  // Union blue
+  'japan':              '#b82020',  // Rising Sun red
+  'qing-dynasty':       '#d8b820',  // Imperial Chinese yellow
+  'persia':             '#a03878',  // Persian purple-rose
+  'afghanistan':        '#687838',  // Afghan olive
+  'siam':               '#e89018',  // Siamese gold
+  'ethiopia':           '#287828',  // Ethiopian green
+  'liberia':            '#b83030',  // Liberian red
+  // ── Latin America ─────────────────────────────────────────────────────
+  'argentina':          '#48a8c8',  // Argentine sky blue
+  'brazil':             '#208040',  // Brazilian green
+  'chile':              '#c01818',  // Chilean red
+  'colombia':           '#d8b018',  // Colombian gold
+  'mexico':             '#308848',  // Mexican green
+  'peru':               '#d01818',  // Peruvian red
+  'venezuela':          '#d8b818',  // Venezuelan gold
+  'bolivia':            '#c83030',  // Bolivian red
+  'ecuador':            '#d8b818',  // Ecuadorian yellow
+  'paraguay':           '#c02828',  // Paraguayan red
+  'uruguay':            '#1860b0',  // Uruguayan blue
+  'cuba':               '#1050a0',  // Cuban blue
+  'haiti':              '#2848a0',  // Haitian blue
+  'dominican-republic': '#c82020',  // Dominican red
+  'guatemala':          '#1858a8',  // Guatemalan blue
+  'honduras':           '#1858b0',  // Honduran blue
+  'el-salvador':        '#1848a0',  // Salvadoran blue
+  'nicaragua':          '#1858a0',  // Nicaraguan blue
+  'costa-rica':         '#1858a8',  // Costa Rican blue
+  'panama':             '#c02828',  // Panamanian red
+  'order-of-malta':     '#c82020',
 };
 
-const DEFAULT_MAPPED_COLOR = '#d0c0a0';   // fallback for any mapped slug without a colour
+const DEFAULT_MAPPED_COLOR = '#5a6878';  // neutral grey-blue fallback
 
 // Per-ISO overrides: specific sub-features get their own coat of arms
 const ISO_TO_HERALDRY: Record<number, string> = {
@@ -416,9 +416,11 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
     aria-label="Interactive world map of Belle Époque era (~1900)"
   >
     <defs>
-      <filter id="map-glow" x="-20%" y="-20%" width="140%" height="140%">
-        <feGaussianBlur stdDeviation="4" result="blur"/>
-        <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+      <filter id="map-glow" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="3" result="blur"/>
+        <feFlood flood-color="rgba(255,220,80,0.6)" result="colour"/>
+        <feComposite in="colour" in2="blur" operator="in" result="glow"/>
+        <feMerge><feMergeNode in="glow"/><feMergeNode in="SourceGraphic"/></feMerge>
       </filter>
       <filter id="heraldry-filter" color-interpolation-filters="sRGB">
         <feColorMatrix type="matrix"
@@ -537,157 +539,166 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 </div>
 
 <style>
-/* ── Wrapper — parchment paper background ─────────────────────────────────── */
+/* ── Wrapper — EU4/HOI4 dark strategy game frame ─────────────────────────── */
 .map-wrapper {
   position: relative;
   width: min(100%, calc((100svh - 130px) * 960 / 540));
   aspect-ratio: 960 / 540;
   margin: 0 auto;
   overflow: hidden;
-  background: #e8dcc4;
-  border: 2px solid #8a7455;
-  border-radius: 3px;
-  box-shadow: inset 0 0 40px rgba(100, 80, 40, 0.18), 0 4px 20px rgba(0,0,0,0.35);
+  background: #0a0e14;
+  border: 2px solid #2a3848;
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px #111820, 0 6px 32px rgba(0,0,0,0.7);
 }
 
-/* Slight sepia ageing on the whole map */
+/* Radial vignette overlay — darkens edges like EU4 */
+.map-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 50%,
+    transparent 45%,
+    rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .world-map {
   width: 100%;
   height: 100%;
   display: block;
-  filter: sepia(0.18) contrast(0.96) brightness(1.02);
 }
 
-/* Ocean — vintage pale blue */
-.map-ocean { fill: #a8c8d8; }
+/* Ocean — deep navy, EU4 style */
+.map-ocean { fill: #162030; }
 
 /* Sphere outline */
 .map-sphere-outline {
   fill: none;
-  stroke: #6a8898;
-  stroke-width: 1;
+  stroke: #203040;
+  stroke-width: 1.5;
 }
 
-/* Graticule — thin warm-grey grid */
+/* Graticule — very subtle, barely visible like EU4 */
 .map-graticule {
   fill: none;
-  stroke: #8a9898;
-  stroke-width: 0.35;
-  stroke-dasharray: none;
+  stroke: #203040;
+  stroke-width: 0.4;
   pointer-events: none;
-  opacity: 0.6;
+  opacity: 0.5;
 }
 
-/* Neutral / unmapped countries — parchment */
+/* Neutral / unmapped — dark olive */
 .map-neutral {
-  fill: #d8ccb4;
-  stroke: #a89878;
+  fill: #222818;
+  stroke: #1a2010;
   stroke-width: 0.3;
 }
 
-/* Country fill — uses CSS custom property --c set per element */
+/* ── Country fills ─────────────────────────────────────────────────────────
+   CSS custom property --c is set per <a> element in the template.
+   Active countries: full vivid colour.
+   Inactive: desaturated + darkened (EU4 "greyed out" territories).        */
 .map-fill {
-  fill: var(--c, #d0c0a0);
+  fill: var(--c, #3a4858);
   stroke: none;
-  transition: filter 0.18s;
+  transition: filter 0.15s;
 }
 
-/* Inactive: slightly desaturated */
 .map-country:not(.map-country--active) .map-fill {
-  filter: saturate(0.7) brightness(0.97);
+  filter: saturate(0.35) brightness(0.65);
 }
 
-/* Hover — inactive */
 .map-country:not(.map-country--active).map-js-hover .map-fill {
-  filter: saturate(0.85) brightness(1.06);
+  filter: saturate(0.55) brightness(0.80);
 }
 
-/* Hover — active */
 .map-country--active.map-js-hover .map-fill {
-  filter: saturate(1.15) brightness(1.08);
+  filter: saturate(1.2) brightness(1.18);
 }
 
-/* Coat of arms / flag overlay */
+/* ── Heraldry overlay ──────────────────────────────────────────────────── */
 .map-heraldry {
-  opacity: 0.12;
-  filter: url(#heraldry-filter) saturate(0.6);
+  opacity: 0.08;
+  filter: url(#heraldry-filter);
   pointer-events: none;
-  transition: opacity 0.3s, filter 0.3s;
+  transition: opacity 0.25s, filter 0.25s;
 }
 .map-country--active .map-heraldry {
-  opacity: 0.55;
+  opacity: 0.45;
   filter: url(#heraldry-filter);
 }
 .map-country--active.map-js-hover .map-heraldry {
-  opacity: 0.7;
-  filter: url(#heraldry-filter) brightness(1.05);
+  opacity: 0.6;
+  filter: url(#heraldry-filter) brightness(1.1);
 }
 
-/* Hover outlines — dark brown for vintage feel */
+/* ── Hover outline — bright gold/white glow like EU4 selection ──────────── */
 .map-outline {
   fill: none;
   stroke: transparent;
-  stroke-width: 2;
+  stroke-width: 2.5;
   pointer-events: none;
-  transition: stroke 0.15s;
+  transition: stroke 0.12s, filter 0.12s;
 }
 .map-outline.map-js-hover {
-  stroke: #6a4a20;
+  stroke: rgba(255, 220, 100, 0.9);
   filter: url(#map-glow);
 }
 
-/* Border layers — warm dark brown */
+/* ── Borders ────────────────────────────────────────────────────────────── */
 .map-country { outline: none; cursor: default; }
 .map-country--active { cursor: pointer; }
 
 .map-border-interior {
   fill: none;
-  stroke: #8a7860;
-  stroke-width: 0.35;
+  stroke: rgba(0, 0, 0, 0.5);
+  stroke-width: 0.4;
   pointer-events: none;
 }
 .map-border-exterior {
   fill: none;
-  stroke: #6a5840;
-  stroke-width: 0.9;
+  stroke: rgba(0, 0, 0, 0.75);
+  stroke-width: 1.2;
   pointer-events: none;
 }
 
-/* German state dots */
+/* ── German sub-state dots ──────────────────────────────────────────────── */
 .map-state-marker circle {
-  fill: #b8a888;
-  stroke: #7a6848;
-  stroke-width: 1;
-  transition: filter 0.2s;
+  fill: #3a5878;
+  stroke: #1a3050;
+  stroke-width: 1.2;
+  transition: filter 0.15s;
 }
 .map-state-marker--active circle {
-  fill: #b0c888;
-  stroke: #6a8848;
+  fill: #4a70c0;
+  stroke: #2a5098;
 }
 .map-state-marker { outline: none; }
 .map-state-marker--active { cursor: pointer; }
 .map-state-marker--active.map-js-hover circle {
-  filter: brightness(1.15);
+  filter: brightness(1.3);
 }
 
-/* Tooltip — vintage parchment style */
+/* ── Tooltip — dark game UI style ───────────────────────────────────────── */
 .map-tooltip {
   position: absolute;
-  background: rgba(232, 220, 190, 0.97);
-  border: 1px solid #8a7050;
-  color: #3a2c18;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.07em;
+  background: rgba(10, 16, 26, 0.95);
+  border: 1px solid rgba(180, 150, 60, 0.7);
+  color: #e8d898;
+  font-family: var(--sans);
+  font-size: 0.70rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  padding: 4px 12px;
+  padding: 5px 13px;
   border-radius: 1px;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.12s;
+  transition: opacity 0.1s;
   white-space: nowrap;
   z-index: 10;
-  box-shadow: 1px 2px 6px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,220,80,0.08);
 }
 </style>
 
