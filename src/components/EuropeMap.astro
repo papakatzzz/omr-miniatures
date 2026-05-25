@@ -193,6 +193,70 @@ const ISO_TO_SLUG: Record<number, string> = {
   862: 'venezuela',
 };
 
+// Vintage pastel colour per slug (~1900 political map palette)
+const SLUG_TO_COLOR: Record<string, string> = {
+  // European powers
+  'russian-empire':     '#e8a878',  // warm salmon-orange
+  'united-kingdom':     '#e8a0a8',  // rose pink
+  'france':             '#c8a8d8',  // lavender-purple
+  'german-empire':      '#b0c888',  // sage green
+  'austro-hungary':     '#f0d878',  // warm yellow
+  'ottoman-state':      '#c8b078',  // tan-khaki
+  'italy':              '#98b8d0',  // steel blue
+  'spain':              '#c0d898',  // light green
+  'portugal':           '#e0b888',  // warm peach
+  'sweden-norway':      '#a8c8e0',  // pale blue
+  'belgium':            '#d8b888',  // cream tan
+  'netherlands':        '#b8d0b8',  // pale green
+  'denmark':            '#c8a8c8',  // pale mauve
+  'luxembourg':         '#e8d890',  // pale yellow
+  'switzerland':        '#d0c8b8',  // warm grey
+  'romania':            '#d0b890',  // warm beige
+  'bulgaria':           '#c8b898',  // light tan
+  'serbia':             '#c0b0a0',  // warm grey
+  'greece':             '#90c0c8',  // teal-blue
+  'montenegro':         '#b8a898',  // warm grey
+  'albania':            '#c8b8a8',  // beige
+  // German sub-states (same green family)
+  'bavaria':            '#b0c888',
+  'saxony':             '#b0c888',
+  'württemberg':        '#b0c888',
+  'baden':              '#b0c888',
+  // World powers
+  'united-states':      '#e8b890',  // warm peach-orange
+  'japan':              '#f0c060',  // golden-yellow
+  'qing-dynasty':       '#e0d098',  // pale yellow-cream
+  'persia':             '#d8a8b0',  // dusty rose
+  'afghanistan':        '#c8b890',  // khaki
+  'siam':               '#a8c898',  // pale green
+  'ethiopia':           '#b8a880',  // olive tan
+  'liberia':            '#c0b098',  // warm tan
+  // Latin America
+  'argentina':          '#a0c8b8',  // pale teal
+  'brazil':             '#a8c880',  // light green
+  'chile':              '#b0b8d0',  // blue-grey
+  'colombia':           '#d8b898',  // peach
+  'mexico':             '#e8c888',  // pale gold
+  'peru':               '#c8a890',  // warm tan
+  'venezuela':          '#b8c890',  // sage
+  'bolivia':            '#c8b888',  // khaki
+  'ecuador':            '#b0d0a0',  // light green
+  'paraguay':           '#d0c098',  // warm cream
+  'uruguay':            '#b8c0d0',  // lavender-grey
+  'cuba':               '#e0c0a0',  // warm peach
+  'haiti':              '#b8a898',  // warm grey
+  'dominican-republic': '#c8b8a8',  // warm grey
+  'guatemala':          '#b8c898',  // sage green
+  'honduras':           '#c0c898',  // pale sage
+  'el-salvador':        '#c8c090',  // warm sage
+  'nicaragua':          '#b0c090',  // pale sage
+  'costa-rica':         '#a8c0a8',  // pale green
+  'panama':             '#b0b898',  // pale green-grey
+  'order-of-malta':     '#e8d0b0',
+};
+
+const DEFAULT_MAPPED_COLOR = '#d0c0a0';   // fallback for any mapped slug without a colour
+
 // Per-ISO overrides: specific sub-features get their own coat of arms
 const ISO_TO_HERALDRY: Record<number, string> = {
   826: 'United%20Kingdom.png',
@@ -411,6 +475,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
         const active = activeCountries.has(slug);
         const label = COUNTRY_LABELS[slug] ?? slug;
         const href = lp(`/catalog/?country=${slug}`);
+        const color = SLUG_TO_COLOR[slug] ?? DEFAULT_MAPPED_COLOR;
         return (
           <a
             href={active ? href : undefined}
@@ -419,6 +484,7 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
             data-label={label}
             aria-label={label}
             tabindex={active ? '0' : '-1'}
+            style={`--c: ${color}`}
           >
             <path d={d} class="map-fill" />
             {isoHeraldryBySlug.has(slug)
@@ -471,64 +537,93 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
 </div>
 
 <style>
+/* ── Wrapper — parchment paper background ─────────────────────────────────── */
 .map-wrapper {
   position: relative;
   width: min(100%, calc((100svh - 130px) * 960 / 540));
   aspect-ratio: 960 / 540;
   margin: 0 auto;
   overflow: hidden;
+  background: #e8dcc4;
+  border: 2px solid #8a7455;
+  border-radius: 3px;
+  box-shadow: inset 0 0 40px rgba(100, 80, 40, 0.18), 0 4px 20px rgba(0,0,0,0.35);
 }
 
-.world-map { width: 100%; height: 100%; display: block; }
+/* Slight sepia ageing on the whole map */
+.world-map {
+  width: 100%;
+  height: 100%;
+  display: block;
+  filter: sepia(0.18) contrast(0.96) brightness(1.02);
+}
 
-.map-ocean { fill: #1a3a5c; }
+/* Ocean — vintage pale blue */
+.map-ocean { fill: #a8c8d8; }
 
+/* Sphere outline */
 .map-sphere-outline {
   fill: none;
-  stroke: #2a4a6c;
+  stroke: #6a8898;
   stroke-width: 1;
 }
 
-/* Graticule grid */
+/* Graticule — thin warm-grey grid */
 .map-graticule {
   fill: none;
-  stroke: #1e3f60;
-  stroke-width: 0.4;
+  stroke: #8a9898;
+  stroke-width: 0.35;
+  stroke-dasharray: none;
   pointer-events: none;
+  opacity: 0.6;
 }
 
-/* Neutral / unmapped countries */
+/* Neutral / unmapped countries — parchment */
 .map-neutral {
-  fill: #2a2820;
-  stroke: #1e1c18;
+  fill: #d8ccb4;
+  stroke: #a89878;
   stroke-width: 0.3;
 }
 
-/* Country fill */
+/* Country fill — uses CSS custom property --c set per element */
 .map-fill {
+  fill: var(--c, #d0c0a0);
   stroke: none;
-  transition: fill 0.2s;
+  transition: filter 0.18s;
 }
-.map-country .map-fill { fill: #3a3628; }
-.map-country--active .map-fill { fill: rgba(201, 165, 90, 0.55); }
+
+/* Inactive: slightly desaturated */
+.map-country:not(.map-country--active) .map-fill {
+  filter: saturate(0.7) brightness(0.97);
+}
+
+/* Hover — inactive */
+.map-country:not(.map-country--active).map-js-hover .map-fill {
+  filter: saturate(0.85) brightness(1.06);
+}
+
+/* Hover — active */
+.map-country--active.map-js-hover .map-fill {
+  filter: saturate(1.15) brightness(1.08);
+}
 
 /* Coat of arms / flag overlay */
 .map-heraldry {
-  opacity: 0.20;
-  filter: url(#heraldry-filter);
+  opacity: 0.12;
+  filter: url(#heraldry-filter) saturate(0.6);
   pointer-events: none;
   transition: opacity 0.3s, filter 0.3s;
 }
 .map-country--active .map-heraldry {
-  opacity: 1;
-  filter: url(#heraldry-filter) brightness(1);
+  opacity: 0.55;
+  filter: url(#heraldry-filter);
 }
 .map-country--active.map-js-hover .map-heraldry {
-  opacity: 1;
-  filter: url(#heraldry-filter) brightness(1.1);
+  opacity: 0.7;
+  filter: url(#heraldry-filter) brightness(1.05);
 }
 
-/* Hover outlines */
+/* Hover outlines — dark brown for vintage feel */
 .map-outline {
   fill: none;
   stroke: transparent;
@@ -537,64 +632,62 @@ const exteriorD = pathGen(mesh(worldAtlas as any, obj, (a: any, b: any) => {
   transition: stroke 0.15s;
 }
 .map-outline.map-js-hover {
-  stroke: var(--gold);
+  stroke: #6a4a20;
   filter: url(#map-glow);
 }
 
-/* Hover fill */
+/* Border layers — warm dark brown */
 .map-country { outline: none; cursor: default; }
 .map-country--active { cursor: pointer; }
-.map-country.map-js-hover .map-fill { fill: #4a4438; }
-.map-country--active.map-js-hover .map-fill { fill: rgba(201, 165, 90, 0.65); }
 
-/* Global border layers */
 .map-border-interior {
   fill: none;
-  stroke: #2a2820;
-  stroke-width: 0.3;
+  stroke: #8a7860;
+  stroke-width: 0.35;
   pointer-events: none;
 }
 .map-border-exterior {
   fill: none;
-  stroke: #4a4030;
-  stroke-width: 0.8;
+  stroke: #6a5840;
+  stroke-width: 0.9;
   pointer-events: none;
 }
 
 /* German state dots */
 .map-state-marker circle {
-  fill: #2e2b26;
-  stroke: #3e3a34;
+  fill: #b8a888;
+  stroke: #7a6848;
   stroke-width: 1;
-  transition: fill 0.2s;
+  transition: filter 0.2s;
 }
 .map-state-marker--active circle {
-  fill: rgba(201, 165, 90, 0.5);
-  stroke: rgba(201, 165, 90, 0.8);
+  fill: #b0c888;
+  stroke: #6a8848;
 }
 .map-state-marker { outline: none; }
 .map-state-marker--active { cursor: pointer; }
 .map-state-marker--active.map-js-hover circle {
-  fill: var(--gold);
+  filter: brightness(1.15);
 }
 
-/* Tooltip */
+/* Tooltip — vintage parchment style */
 .map-tooltip {
   position: absolute;
-  background: rgba(14, 12, 10, 0.92);
-  border: 1px solid rgba(201, 165, 90, 0.4);
-  color: var(--white);
-  font-family: var(--sans);
+  background: rgba(232, 220, 190, 0.97);
+  border: 1px solid #8a7050;
+  color: #3a2c18;
+  font-family: Georgia, 'Times New Roman', serif;
   font-size: 0.72rem;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
-  padding: 5px 12px;
-  border-radius: 2px;
+  padding: 4px 12px;
+  border-radius: 1px;
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.12s;
   white-space: nowrap;
   z-index: 10;
+  box-shadow: 1px 2px 6px rgba(0,0,0,0.2);
 }
 </style>
 
